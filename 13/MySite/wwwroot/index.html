@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Управление библиотекой</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z"/>
+        <path d="M6.5 17A2.5 2.5 0 0 0 4 19.5 2.5 2.5 0 0 0 6.5 22H20v-5"/>
+      </svg>
+      <div>
+        <h1 id="library-name">Библиотека</h1>
+        <p class="muted" id="library-rules">Загрузка…</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="stats" aria-label="Статистика библиотеки">
+      <div class="stat"><span class="stat-value" id="stat-total">–</span><span class="stat-label">Всего книг</span></div>
+      <div class="stat"><span class="stat-value" id="stat-available">–</span><span class="stat-label">Доступно</span></div>
+      <div class="stat"><span class="stat-value" id="stat-borrowed">–</span><span class="stat-label">Выдано</span></div>
+      <div class="stat"><span class="stat-value" id="stat-overdue">–</span><span class="stat-label">Просрочено</span></div>
+      <div class="stat"><span class="stat-value" id="stat-readers">–</span><span class="stat-label">Читателей</span></div>
+    </section>
+
+    <div class="layout">
+      <div class="column-main">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Книги</h2>
+            <span class="muted" id="books-count"></span>
+          </div>
+
+          <form class="toolbar" id="search-form" autocomplete="off">
+            <input type="search" id="search-q" placeholder="Поиск…" aria-label="Текст для поиска">
+            <select id="search-by" aria-label="Искать по">
+              <option value="title">по названию</option>
+              <option value="author">по автору</option>
+              <option value="year">по году</option>
+            </select>
+            <button type="button" class="ghost" id="sort-year">Сортировать по году</button>
+          </form>
+
+          <div class="table-wrap">
+            <table class="books">
+              <thead>
+                <tr><th>Название</th><th>Автор</th><th>Год</th><th>Статус</th><th></th></tr>
+              </thead>
+              <tbody id="books-body"></tbody>
+            </table>
+          </div>
+          <p class="empty" id="books-empty" hidden>Книг не найдено.</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Читатели</h2>
+            <span class="muted" id="readers-count"></span>
+          </div>
+          <ul class="readers" id="readers-list"></ul>
+          <p class="empty" id="readers-empty" hidden>Читателей пока нет — зарегистрируйте первого.</p>
+        </section>
+      </div>
+
+      <aside class="column-side">
+        <section class="panel">
+          <h2>Добавить книгу</h2>
+          <form id="add-book-form" class="form" autocomplete="off">
+            <label>Название <input name="title" required></label>
+            <label>Автор <input name="author" required></label>
+            <label>Год <input name="year" type="number" min="1" required></label>
+            <label>Описание
+              <textarea name="description" rows="3" maxlength="1000" placeholder="необязательно"></textarea>
+            </label>
+            <button type="submit">Добавить</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Выдать книгу</h2>
+          <form id="borrow-form" class="form">
+            <label>Книга <select name="title" id="borrow-book" required></select></label>
+            <label>Читатель <select name="readerName" id="borrow-reader" required></select></label>
+            <button type="submit">Выдать</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Вернуть книгу</h2>
+          <form id="return-form" class="form">
+            <label>Книга <select name="title" id="return-book" required></select></label>
+            <label>Дней у читателя
+              <input name="daysKept" type="number" min="0" placeholder="по дате выдачи">
+            </label>
+            <p class="hint" id="return-hint"></p>
+            <button type="submit">Вернуть</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Новый читатель</h2>
+          <form id="add-reader-form" class="form" autocomplete="off">
+            <label>Имя <input name="firstName" required></label>
+            <label>Фамилия <input name="lastName" placeholder="необязательно"></label>
+            <label>Телефон <input name="phone" type="tel" placeholder="необязательно"></label>
+            <button type="submit">Зарегистрировать</button>
+          </form>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <dialog id="desc-dialog" aria-labelledby="desc-heading">
+    <form id="desc-form" class="form">
+      <h2 id="desc-heading">Описание книги</h2>
+      <p class="muted" id="desc-book"></p>
+      <input type="hidden" name="title">
+      <label>Описание
+        <textarea name="description" rows="7" maxlength="1000" placeholder="О чём эта книга?"></textarea>
+      </label>
+      <p class="hint" id="desc-counter"></p>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="desc-cancel">Отмена</button>
+        <button type="submit">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
